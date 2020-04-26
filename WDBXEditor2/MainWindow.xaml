@@ -1,0 +1,58 @@
+﻿<Window x:Class="WDBXEditor2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" Title="WDBXEditor2" Height="640" Width="960"
+        MinWidth="960" MinHeight="640">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
+            <RowDefinition Height="215" />
+        </Grid.RowDefinitions>
+        <Menu IsMainMenu="True" Grid.Row="0" Grid.ColumnSpan="2">
+            <MenuItem Header="_File">
+                <MenuItem x:Name="OpenDB" Header="Open..." Click="OpenDB_Click"/>
+                <Separator />
+                <MenuItem Header="Save" />
+                <MenuItem Header="Save As..." />
+                <Separator />
+                <MenuItem x:Name="Exit" Header="Exit" />
+            </MenuItem>
+            <MenuItem Header="_Edit"/>
+            <MenuItem Header="_Export"/>
+            <MenuItem Header="_Import"/>
+            <MenuItem Header="_Tools"/>
+        </Menu>
+        <Grid Grid.Row="1" Grid.ColumnSpan="2">
+            <DataGrid x:Name="DB2DataGrid" Margin="5,5,5,5" Background="#FF939393" CanUserResizeRows="False"
+                      CanUserReorderColumns="False" CanUserSortColumns="False" AutoGenerateColumns="True"
+                      VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                      ItemsSource="{Binding null, IsAsync=True}" EnableColumnVirtualization="True" EnableRowVirtualization="True"/>
+        </Grid>
+        <Grid Grid.Row="2" Grid.Column="0">
+            <GroupBox Header="Files" Margin="5,0,5,10">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition Width="350"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0">
+                        <ListBox x:Name="OpenDBItems" Margin="0,0,5,0" SelectionChanged="OpenDBItems_SelectionChanged" />
+                    </Grid>
+                    <Grid Grid.Column="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition Height="20"/>
+                        </Grid.RowDefinitions>
+                        <GroupBox Grid.Row="0" Header="Filter" Margin="0,-10,0,5">
+
+                        </GroupBox>
+                        <ProgressBar x:Name="ProgressBar" Grid.Row="1" Value="0" />
+                    </Grid>
+                </Grid>
+            </GroupBox>
+        </Grid>
+    </Grid>
+</Window>
