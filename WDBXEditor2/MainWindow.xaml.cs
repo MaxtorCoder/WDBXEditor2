@@ -32,9 +32,9 @@ namespace WDBXEditor2
         {
             var openFileDialog = new OpenFileDialog
             {
-                Multiselect         = true,
-                Filter              = "DB2 Files (*.db2)|*.db2",
-                InitialDirectory    = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                Multiselect = true,
+                Filter = "DB2 Files (*.db2)|*.db2",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
             };
 
             if (openFileDialog.ShowDialog() == true)
@@ -74,37 +74,42 @@ namespace WDBXEditor2
         private void FillColumns(IDBCDStorage storage, ref DataTable data)
         {
             var firstItem = storage.Values.First();
-            for (var i = 0; i < storage.AvailableColumns.Length; ++i)
+
+            foreach (string columnName in firstItem.GetDynamicMemberNames())
             {
-                var field = firstItem[storage.AvailableColumns[i]];
-                // if (field is Array arr)
-                // {
-                //     for (var j = 0; j < arr.Length; ++j)
-                //         data.Columns.Add($"{storage.AvailableColumns[i]}{j}");
-                // }
-                // else
-                    data.Columns.Add(storage.AvailableColumns[i]);
+                var columnValue = firstItem[columnName];
+
+                if (columnValue.GetType().IsArray)
+                {
+                    Array columnValueArray = (Array)columnValue;
+                    for (var i = 0; i < columnValueArray.Length; ++i)
+                        data.Columns.Add(columnName + i);
+                }
+                else
+                    data.Columns.Add(columnName);
             }
         }
 
         private void FillData(IDBCDStorage storage, ref DataTable data)
         {
-            foreach (var item in storage.Values)
+            foreach (var rowData in storage.Values)
             {
                 var row = data.NewRow();
-                for (var i = 0; i < storage.AvailableColumns.Length; ++i)
+
+                foreach (string columnName in rowData.GetDynamicMemberNames())
                 {
-                    var field = item[storage.AvailableColumns[i]];
-                    // if (field is Array arr)
-                    // {
-                    //     for (var j = 0; j < arr.Length; ++j)
-                    //         row[i + j] = arr.GetValue(j).ToString();
-                    // 
-                    //     i += arr.Length;
-                    // }
-                    // else
-                        row[i] = field.ToString();
+                    var columnValue = rowData[columnName];
+
+                    if (columnValue.GetType().IsArray)
+                    {
+                        Array columnValueArray = (Array)columnValue;
+                        for (var i = 0; i < columnValueArray.Length; ++i)
+                            row[columnName + i] = columnValueArray.GetValue(i);
+                    }
+                    else
+                        row[columnName] = columnValue;
                 }
+
                 data.Rows.Add(row);
             }
         }
