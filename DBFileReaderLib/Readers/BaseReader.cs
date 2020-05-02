@@ -18,36 +18,24 @@ namespace DBFileReaderLib.Readers
         public int MaxIndex { get; protected set; }
         public int IdFieldIndex { get; protected set; }
         public DB2Flags Flags { get; protected set; }
+        public int Locale { get; protected set; }
+        public uint Build { get; protected set; }
+        public int PackedDataOffset { get; protected set; }
 
         #region Data
 
-        protected FieldMetaData[] m_meta;
-        public FieldMetaData[] Meta => m_meta;
+        public FieldMetaData[] Meta;
+        public int[] IndexData;
+        public ColumnMetaData[] ColumnMeta;
+        public Value32[][] PalletData;
+        public Dictionary<int, Value32>[] CommonData;
+        public Dictionary<long, string> StringTable;
 
-        protected int[] m_indexData;
-        public int[] IndexData => m_indexData;
-
-        protected ColumnMetaData[] m_columnMeta;
-        public ColumnMetaData[] ColumnMeta => m_columnMeta;
-
-        protected Value32[][] m_palletData;
-        public Value32[][] PalletData => m_palletData;
-
-        protected Dictionary<int, Value32>[] m_commonData;
-        public Dictionary<int, Value32>[] CommonData => m_commonData;
-
-        protected Dictionary<long, string> m_stringsTable;
-        public Dictionary<long, string> StringTable => m_stringsTable;
-
-        protected Dictionary<int, int> m_copyData;
-
-        protected byte[] recordsData;
-        protected Dictionary<int, IDBRow> _Records = new Dictionary<int, IDBRow>();
-
-        protected List<SparseEntry> m_sparseEntries;
-
-        protected int[] m_foreignKeyData;
-        public int[] ForeignKeyData => m_foreignKeyData;
+        protected byte[] RecordsData;
+        protected Dictionary<int, int> CopyData { get; set; }
+        protected Dictionary<int, IDBRow> _Records { get; set; } = new Dictionary<int, IDBRow>();
+        protected List<SparseEntry> SparseEntries { get; set; }
+        public int[] ForeignKeyData { get; set; }
 
         #endregion
 
@@ -61,13 +49,13 @@ namespace DBFileReaderLib.Readers
 
         private IEnumerable<IDBRow> GetCopyRows()
         {
-            if (m_copyData == null || m_copyData.Count == 0)
+            if (CopyData == null || CopyData.Count == 0)
                 yield break;
 
             // fix temp ids
             _Records = _Records.ToDictionary(x => x.Value.Id, x => x.Value);
 
-            foreach (var copyRow in m_copyData)
+            foreach (var copyRow in CopyData)
             {
                 IDBRow rec = _Records[copyRow.Value].Clone();
                 rec.Data = rec.Data.Clone();
@@ -76,7 +64,21 @@ namespace DBFileReaderLib.Readers
                 yield return rec;
             }
 
-            m_copyData.Clear();
+            CopyData.Clear();
+        }
+        public void Clear()
+        {
+            IndexData = null;
+            PalletData = null;
+            ColumnMeta = null;
+            RecordsData = null;
+            ForeignKeyData = null;
+            CommonData = null;
+
+            _Records?.Clear();
+            StringTable?.Clear();
+            SparseEntries?.Clear();
+            CopyData?.Clear();
         }
 
         #endregion

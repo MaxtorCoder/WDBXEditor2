@@ -268,34 +268,34 @@ namespace DBFileReaderLib.Readers
                     return;
 
                 var sections = reader.ReadArray<SectionHeaderWDC3>(sectionsCount).ToList();
-                this.m_sections = sections.OfType<IEncryptableDatabaseSection>().ToList();
+                m_sections = sections.OfType<IEncryptableDatabaseSection>().ToList();
 
                 // field meta data
-                m_meta = reader.ReadArray<FieldMetaData>(FieldsCount);
+                Meta = reader.ReadArray<FieldMetaData>(FieldsCount);
 
                 // column meta data
-                m_columnMeta = reader.ReadArray<ColumnMetaData>(FieldsCount);
+                ColumnMeta = reader.ReadArray<ColumnMetaData>(FieldsCount);
 
                 // pallet data
-                m_palletData = new Value32[m_columnMeta.Length][];
-                for (int i = 0; i < m_columnMeta.Length; i++)
+                PalletData = new Value32[ColumnMeta.Length][];
+                for (int i = 0; i < ColumnMeta.Length; i++)
                 {
-                    if (m_columnMeta[i].CompressionType == CompressionType.Pallet || m_columnMeta[i].CompressionType == CompressionType.PalletArray)
+                    if (ColumnMeta[i].CompressionType == CompressionType.Pallet || ColumnMeta[i].CompressionType == CompressionType.PalletArray)
                     {
-                        m_palletData[i] = reader.ReadArray<Value32>((int)m_columnMeta[i].AdditionalDataSize / 4);
+                        PalletData[i] = reader.ReadArray<Value32>((int)ColumnMeta[i].AdditionalDataSize / 4);
                     }
                 }
 
                 // common data
-                m_commonData = new Dictionary<int, Value32>[m_columnMeta.Length];
-                for (int i = 0; i < m_columnMeta.Length; i++)
+                CommonData = new Dictionary<int, Value32>[ColumnMeta.Length];
+                for (int i = 0; i < ColumnMeta.Length; i++)
                 {
-                    if (m_columnMeta[i].CompressionType == CompressionType.Common)
+                    if (ColumnMeta[i].CompressionType == CompressionType.Common)
                     {
-                        var commonValues = new Dictionary<int, Value32>((int)m_columnMeta[i].AdditionalDataSize / 8);
-                        m_commonData[i] = commonValues;
+                        var commonValues = new Dictionary<int, Value32>((int)ColumnMeta[i].AdditionalDataSize / 8);
+                        CommonData[i] = commonValues;
 
-                        for (int j = 0; j < m_columnMeta[i].AdditionalDataSize / 8; j++)
+                        for (int j = 0; j < ColumnMeta[i].AdditionalDataSize / 8; j++)
                             commonValues[reader.ReadInt32()] = reader.Read<Value32>();
                     }
                 }
@@ -308,18 +308,18 @@ namespace DBFileReaderLib.Readers
                     if (!Flags.HasFlagExt(DB2Flags.Sparse))
                     {
                         // records data
-                        recordsData = reader.ReadBytes(section.NumRecords * RecordSize);
+                        RecordsData = reader.ReadBytes(section.NumRecords * RecordSize);
 
-                        Array.Resize(ref recordsData, recordsData.Length + 8); // pad with extra zeros so we don't crash when reading
+                        Array.Resize(ref RecordsData, RecordsData.Length + 8); // pad with extra zeros so we don't crash when reading
 
                         // string data
-                        if (m_stringsTable == null)
-                            m_stringsTable = new Dictionary<long, string>(section.StringTableSize / 0x20);
+                        if (StringTable == null)
+                            StringTable = new Dictionary<long, string>(section.StringTableSize / 0x20);
 
                         for (int i = 0; i < section.StringTableSize;)
                         {
                             long oldPos = reader.BaseStream.Position;
-                            m_stringsTable[i + previousStringTableSize] = reader.ReadCString();
+                            StringTable[i + previousStringTableSize] = reader.ReadCString();
                             i += (int)(reader.BaseStream.Position - oldPos);
                         }
 
@@ -328,34 +328,34 @@ namespace DBFileReaderLib.Readers
                     else
                     {
                         // sparse data with inlined strings
-                        recordsData = reader.ReadBytes(section.OffsetRecordsEndOffset - section.FileOffset);
+                        RecordsData = reader.ReadBytes(section.OffsetRecordsEndOffset - section.FileOffset);
 
                         if (reader.BaseStream.Position != section.OffsetRecordsEndOffset)
                             throw new Exception("reader.BaseStream.Position != section.OffsetRecordsEndOffset");
                     }
 
                     // skip encrypted sections => has tact key + record data is zero filled
-                    if (section.TactKeyLookup != 0 && Array.TrueForAll(recordsData, x => x == 0))
+                    if (section.TactKeyLookup != 0 && Array.TrueForAll(RecordsData, x => x == 0))
                     {
                         previousRecordCount += section.NumRecords;
                         continue;
                     }
 
                     // index data
-                    m_indexData = reader.ReadArray<int>(section.IndexDataSize / 4);
+                    IndexData = reader.ReadArray<int>(section.IndexDataSize / 4);
 
                     // fix zero-filled index data
-                    if (m_indexData.Length > 0 && m_indexData.All(x => x == 0))
-                        m_indexData = Enumerable.Range(MinIndex + previousRecordCount, section.NumRecords).ToArray();
+                    if (IndexData.Length > 0 && IndexData.All(x => x == 0))
+                        IndexData = Enumerable.Range(MinIndex + previousRecordCount, section.NumRecords).ToArray();
 
                     // duplicate rows data
                     if (section.CopyTableCount > 0)
                     {
-                        if (m_copyData == null)
-                            m_copyData = new Dictionary<int, int>();
+                        if (CopyData == null)
+                            CopyData = new Dictionary<int, int>();
 
                         for (int i = 0; i < section.CopyTableCount; i++)
-                            m_copyData[reader.ReadInt32()] = reader.ReadInt32();
+                            CopyData[reader.ReadInt32()] = reader.ReadInt32();
                     }
 
                     if (section.OffsetMapIDCount > 0)
@@ -364,7 +364,7 @@ namespace DBFileReaderLib.Readers
                         if (TableHash == 145293629)
                             reader.BaseStream.Position += 4 * section.OffsetMapIDCount;
 
-                        m_sparseEntries = reader.ReadArray<SparseEntry>(section.OffsetMapIDCount).ToList();
+                        SparseEntries = reader.ReadArray<SparseEntry>(section.OffsetMapIDCount).ToList();
                     }
 
                     // reference data
@@ -384,21 +384,21 @@ namespace DBFileReaderLib.Readers
                     {
                         int[] sparseIndexData = reader.ReadArray<int>(section.OffsetMapIDCount);
 
-                        if (section.IndexDataSize > 0 && m_indexData.Length != sparseIndexData.Length)
+                        if (section.IndexDataSize > 0 && IndexData.Length != sparseIndexData.Length)
                             throw new Exception("m_indexData.Length != sparseIndexData.Length");
 
-                        m_indexData = sparseIndexData;
+                        IndexData = sparseIndexData;
                     }
 
                     int position = 0;
                     for (int i = 0; i < section.NumRecords; i++)
                     {
-                        BitReader bitReader = new BitReader(recordsData) { Position = 0 };
+                        BitReader bitReader = new BitReader(RecordsData) { Position = 0 };
 
                         if (Flags.HasFlagExt(DB2Flags.Sparse))
                         {
                             bitReader.Position = position;
-                            position += m_sparseEntries[i].Size * 8;
+                            position += SparseEntries[i].Size * 8;
                         }
                         else
                         {
@@ -407,7 +407,7 @@ namespace DBFileReaderLib.Readers
 
                         refData.Entries.TryGetValue(i, out int refId);
 
-                        IDBRow rec = new WDC3Row(this, bitReader, section.IndexDataSize != 0 ? m_indexData[i] : -1, refId, i + previousRecordCount);
+                        IDBRow rec = new WDC3Row(this, bitReader, section.IndexDataSize != 0 ? IndexData[i] : -1, refId, i + previousRecordCount);
                         _Records.Add(_Records.Count, rec);
                     }
 

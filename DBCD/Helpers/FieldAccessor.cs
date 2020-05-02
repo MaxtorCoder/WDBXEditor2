@@ -66,7 +66,6 @@ namespace DBCD.Helpers
             }
         }
 
-
         private T ConvertArray<T>(Array array)
         {
             var type = typeof(T);

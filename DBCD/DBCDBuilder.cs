@@ -32,11 +32,11 @@ namespace DBCD
             var moduleBuilder = assemblyBuilder.DefineDynamicModule(assemblyName.Name);
 
             this.moduleBuilder = moduleBuilder;
-            this.locStringSize = 1;
+            locStringSize = 1;
             this.locale = locale;
         }
 
-        internal Tuple<Type, DBCDInfo> Build(DBReader dbcReader, Stream dbd, string name, string build)
+        internal Tuple<Type, DBCDInfo> Build(DBParser dbcReader, Stream dbd, string name, string build)
         {
             var dbdReader = new DBDReader();
 

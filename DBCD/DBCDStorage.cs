@@ -1,7 +1,6 @@
 using DBCD.Helpers;
 
 using DBFileReaderLib;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Dynamic;
@@ -26,22 +25,22 @@ namespace DBCD
 
         public override bool TryGetMember(GetMemberBinder binder, out object result)
         {
-            return fieldAccessor.TryGetMember(this.raw, binder.Name, out result);
+            return fieldAccessor.TryGetMember(raw, binder.Name, out result);
         }
 
         public object this[string fieldName]
         {
-            get => fieldAccessor[this.raw, fieldName];
+            get => fieldAccessor[raw, fieldName];
         }
 
         public T Field<T>(string fieldName)
         {
-            return (T)fieldAccessor[this.raw, fieldName];
+            return (T)fieldAccessor[raw, fieldName];
         }
 
         public T FieldAs<T>(string fieldName)
         {
-            return fieldAccessor.GetMemberAs<T>(this.raw, fieldName);
+            return fieldAccessor.GetMemberAs<T>(raw, fieldName);
         }
 
         public override IEnumerable<string> GetDynamicMemberNames()
@@ -57,8 +56,8 @@ namespace DBCD
 
         internal DynamicKeyValuePair(T key, dynamic value)
         {
-            this.Key = key;
-            this.Value = value;
+            Key = key;
+            Value = value;
         }
     }
 
@@ -66,42 +65,36 @@ namespace DBCD
     {
         string[] AvailableColumns { get; }
 
+        DBCDInfo GetDBCDInfo();
         Dictionary<ulong, int> GetEncryptedSections();
-        IDBCDStorage ApplyingHotfixes(HotfixReader hotfixReader);
+        void Save(string filename);
     }
 
-    public class DBCDStorage<T> : ReadOnlyDictionary<int, DBCDRow>, IDBCDStorage where T : class, new()
+    public class DBCDStorage<T> : Dictionary<int, DBCDRow>, IDBCDStorage where T : class, new()
     {
         private readonly FieldAccessor fieldAccessor;
-        private readonly ReadOnlyDictionary<int, T> storage;
+        private readonly Storage<T> db2Storage;
         private readonly DBCDInfo info;
-        private readonly DBReader reader;
+        private readonly DBParser parser;
 
-        string[] IDBCDStorage.AvailableColumns => this.info.availableColumns;
-        public override string ToString() => $"{this.info.tableName}";
+        string[] IDBCDStorage.AvailableColumns => info.availableColumns;
+        public override string ToString() => $"{info.tableName}";
 
-        public DBCDStorage(Stream stream, DBCDInfo info) : this(new DBReader(stream), info) { }
+        public DBCDStorage(Stream stream, DBCDInfo info) : this(new DBParser(stream), info) { }
 
-        public DBCDStorage(DBReader dbReader, DBCDInfo info) : this(dbReader, new ReadOnlyDictionary<int, T>(dbReader.GetRecords<T>()), info) { }
+        public DBCDStorage(DBParser dbReader, DBCDInfo info) : this(dbReader, dbReader.GetRecords<T>(), info) { }
 
-        public DBCDStorage(DBReader reader, ReadOnlyDictionary<int, T> storage, DBCDInfo info) : base(new Dictionary<int, DBCDRow>())
+        public DBCDStorage(DBParser parser, Storage<T> storage, DBCDInfo info) : base(new Dictionary<int, DBCDRow>())
         {
-            this.info = info;
-            this.fieldAccessor = new FieldAccessor(typeof(T), info.availableColumns);
-            this.reader = reader;
-            this.storage = storage;
+            this.info       = info;
+            fieldAccessor   = new FieldAccessor(typeof(T), info.availableColumns);
+            this.parser     = parser;
+            db2Storage      = storage;
 
-            foreach (var record in storage)
-                base.Dictionary.Add(record.Key, new DBCDRow(record.Key, record.Value, fieldAccessor));
-        }
+            foreach (var record in db2Storage)
+                Add(record.Key, new DBCDRow(record.Key, record.Value, fieldAccessor));
 
-        public IDBCDStorage ApplyingHotfixes(HotfixReader hotfixReader)
-        {
-            var mutableStorage = this.storage.ToDictionary(k => k.Key, v => v.Value);
-
-            hotfixReader.ApplyHotfixes(mutableStorage, this.reader);
-
-            return new DBCDStorage<T>(this.reader, new ReadOnlyDictionary<int, T>(mutableStorage), this.info);
+            parser.ClearCache();
         }
 
         IEnumerator<DynamicKeyValuePair<int>> IEnumerable<DynamicKeyValuePair<int>>.GetEnumerator()
@@ -111,6 +104,10 @@ namespace DBCD
                 yield return new DynamicKeyValuePair<int>(enumerator.Current.Key, enumerator.Current.Value);
         }
         
-        public Dictionary<ulong, int> GetEncryptedSections() => this.reader.GetEncryptedSections();
+        public Dictionary<ulong, int> GetEncryptedSections() => parser.GetEncryptedSections();
+
+        public DBCDInfo GetDBCDInfo() => info;
+
+        public void Save(string filename) => db2Storage?.Save(filename);
     }
 }

@@ -13,23 +13,24 @@
         </Grid.RowDefinitions>
         <Menu IsMainMenu="True" Grid.Row="0" Grid.ColumnSpan="2">
             <MenuItem Header="_File">
-                <MenuItem x:Name="OpenDB" Header="Open..." Click="OpenDB_Click"/>
+                <MenuItem x:Name="Open" Header="Open..." Click="Open_Click" />
                 <Separator />
-                <MenuItem Header="Save" />
-                <MenuItem Header="Save As..." />
+                <MenuItem x:Name="Save" Header="Save" Click="Save_Click" />
+                <MenuItem x:Name="SaveAs" Header="Save As..." Click="SaveAs_Click" />
                 <Separator />
+                <MenuItem x:Name="CloseDB" Header="Close DB2" Click="Close_Click" />
                 <MenuItem x:Name="Exit" Header="Exit" />
             </MenuItem>
             <MenuItem Header="_Edit"/>
             <MenuItem Header="_Export"/>
-            <MenuItem Header="_Import"/>
             <MenuItem Header="_Tools"/>
         </Menu>
         <Grid Grid.Row="1" Grid.ColumnSpan="2">
             <DataGrid x:Name="DB2DataGrid" Margin="5,5,5,5" Background="#FF939393" CanUserResizeRows="False"
                       CanUserReorderColumns="False" CanUserSortColumns="False" AutoGenerateColumns="True"
                       VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
-                      ItemsSource="{Binding null, IsAsync=True}" EnableColumnVirtualization="True" EnableRowVirtualization="True"/>
+                      ItemsSource="{Binding null, IsAsync=True}" EnableColumnVirtualization="True" EnableRowVirtualization="True"
+                      CellEditEnding="DB2DataGrid_CellEditEnding" />
         </Grid>
         <Grid Grid.Row="2" Grid.Column="0">
             <GroupBox Header="Files" Margin="5,0,5,10">

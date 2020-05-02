@@ -21,9 +21,29 @@ namespace DBFileReaderLib
             return Expression.Lambda<Action<T, object>>(assignExpression, paramExpression, valueExpression).Compile();
         }
 
+        public static Func<T, object> GetGetter<T>(this FieldInfo fieldInfo)
+        {
+            var paramExpression = Expression.Parameter(typeof(T));
+            var propertyExpression = Expression.Field(paramExpression, fieldInfo);
+            var convertExpression = Expression.Convert(propertyExpression, typeof(object));
+
+            return Expression.Lambda<Func<T, object>>(convertExpression, paramExpression).Compile();
+        }
+
         public static T GetAttribute<T>(this FieldInfo fieldInfo) where T : Attribute
         {
             return Attribute.GetCustomAttribute(fieldInfo, typeof(T)) as T;
+        }
+
+        public static FieldCache<T>[] ToFieldCache<T>(this Type type)
+        {
+            var fields = type.GetFields();
+
+            var cache = new FieldCache<T>[fields.Length];
+            for (int i = 0; i < fields.Length; i++)
+                cache[i] = new FieldCache<T>(fields[i]);
+
+            return cache;
         }
 
         public static T Read<T>(this BinaryReader reader) where T : struct
@@ -58,6 +78,27 @@ namespace DBFileReaderLib
                 Unsafe.CopyBlockUnaligned(Unsafe.AsPointer(ref result[0]), Unsafe.AsPointer(ref src[0]), (uint)src.Length);
 
             return result;
+        }
+
+        public static unsafe void WriteArray<T>(this BinaryWriter writer, T[] value) where T : struct
+        {
+            if (value.Length == 0)
+                return;
+
+            if (!(value is byte[] buffer))
+            {
+                buffer = new byte[value.Length * Unsafe.SizeOf<T>()];
+                Unsafe.CopyBlockUnaligned(Unsafe.AsPointer(ref buffer[0]), Unsafe.AsPointer(ref value[0]), (uint)buffer.Length);
+            }
+
+            writer.Write(buffer);
+        }
+
+        public static void Write<T>(this BinaryWriter writer, T value) where T : struct
+        {
+            byte[] buffer = new byte[Unsafe.SizeOf<T>()];
+            Unsafe.WriteUnaligned(ref buffer[0], value);
+            writer.Write(buffer);
         }
 
         public static bool HasFlagExt(this DB2Flags flag, DB2Flags valueToCheck)

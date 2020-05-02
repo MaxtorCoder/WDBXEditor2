@@ -10,6 +10,7 @@ namespace DBFileReaderLib
         public readonly bool IsArray = false;
         public readonly bool IsLocalisedString = false;
         public readonly Action<T, object> Setter;
+        public readonly Func<T, object> Getter;
         public readonly LocaleAttribute LocaleInfo;
 
         public bool IndexMapField { get; set; } = false;
@@ -21,6 +22,7 @@ namespace DBFileReaderLib
             IsArray = field.FieldType.IsArray;
             IsLocalisedString = GetStringInfo(field, out LocaleInfo);
             Setter = field.GetSetter<T>();
+            Getter = field.GetGetter<T>();
             Cardinality = GetCardinality(field);
 
             IndexAttribute indexAttribute = (IndexAttribute)Attribute.GetCustomAttribute(field, typeof(IndexAttribute));

@@ -140,21 +140,21 @@ namespace DBFileReaderLib.Readers
                 if (RecordsCount == 0)
                     return;
 
-                recordsData = reader.ReadBytes(RecordsCount * RecordSize);
-                Array.Resize(ref recordsData, recordsData.Length + 8); // pad with extra zeros so we don't crash when reading
+                RecordsData = reader.ReadBytes(RecordsCount * RecordSize);
+                Array.Resize(ref RecordsData, RecordsData.Length + 8); // pad with extra zeros so we don't crash when reading
 
                 for (int i = 0; i < RecordsCount; i++)
                 {
-                    BitReader bitReader = new BitReader(recordsData) { Position = i * RecordSize * 8 };
+                    BitReader bitReader = new BitReader(RecordsData) { Position = i * RecordSize * 8 };
                     IDBRow rec = new WDBCRow(this, bitReader, i);
                     _Records.Add(i, rec);
                 }
 
-                m_stringsTable = new Dictionary<long, string>(StringTableSize / 0x20);
+                StringTable = new Dictionary<long, string>(StringTableSize / 0x20);
                 for (int i = 0; i < StringTableSize;)
                 {
                     long oldPos = reader.BaseStream.Position;
-                    m_stringsTable[i] = reader.ReadCString();
+                    StringTable[i] = reader.ReadCString();
                     i += (int)(reader.BaseStream.Position - oldPos);
                 }
             }

@@ -138,14 +138,14 @@ namespace DBFileReaderLib.Readers
                 RecordSize = reader.ReadInt32();
                 StringTableSize = reader.ReadInt32();
                 TableHash = reader.ReadUInt32();
-                uint build = reader.ReadUInt32();
+                Build = reader.ReadUInt32();
                 uint timestamp = reader.ReadUInt32();
 
                 if (RecordsCount == 0)
                     return;
 
                 // Extended header 
-                if (build > 12880)
+                if (Build > 12880)
                 {
                     if (reader.BaseStream.Length < ExtendedHeaderSize)
                         throw new InvalidDataException("WDB2 file is corrupted!");
@@ -163,21 +163,21 @@ namespace DBFileReaderLib.Readers
                     }
                 }
 
-                recordsData = reader.ReadBytes(RecordsCount * RecordSize);
-                Array.Resize(ref recordsData, recordsData.Length + 8); // pad with extra zeros so we don't crash when reading
+                RecordsData = reader.ReadBytes(RecordsCount * RecordSize);
+                Array.Resize(ref RecordsData, RecordsData.Length + 8); // pad with extra zeros so we don't crash when reading
 
                 for (int i = 0; i < RecordsCount; i++)
                 {
-                    BitReader bitReader = new BitReader(recordsData) { Position = i * RecordSize * 8 };
+                    BitReader bitReader = new BitReader(RecordsData) { Position = i * RecordSize * 8 };
                     IDBRow rec = new WDB2Row(this, bitReader, i);
                     _Records.Add(i, rec);
                 }
 
-                m_stringsTable = new Dictionary<long, string>(StringTableSize / 0x20);
+                StringTable = new Dictionary<long, string>(StringTableSize / 0x20);
                 for (int i = 0; i < StringTableSize;)
                 {
                     long oldPos = reader.BaseStream.Position;
-                    m_stringsTable[i] = reader.ReadCString();
+                    StringTable[i] = reader.ReadCString();
                     i += (int)(reader.BaseStream.Position - oldPos);
                 }
             }

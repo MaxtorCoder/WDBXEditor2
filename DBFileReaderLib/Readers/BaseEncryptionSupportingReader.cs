@@ -10,7 +10,7 @@ namespace DBFileReaderLib.Readers
 
         List<IEncryptableDatabaseSection> IEncryptionSupportingReader.GetEncryptedSections()
         {
-            return this.m_sections.Where(s => s.TactKeyLookup != 0).ToList();
+            return m_sections.Where(s => s.TactKeyLookup != 0).ToList();
         }
     }
 }

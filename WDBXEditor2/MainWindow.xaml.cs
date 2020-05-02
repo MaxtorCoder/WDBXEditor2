@@ -18,6 +18,8 @@ namespace WDBXEditor2
     public partial class MainWindow : Window
     {
         private DBLoader dbLoader = new DBLoader();
+        private string currentOpenDB2 = string.Empty;
+        private IDBCDStorage openedDB2Storage;
 
         public MainWindow()
         {
@@ -28,7 +30,7 @@ namespace WDBXEditor2
             Title = $"WDBXEditor2  -  {Constants.Version}";
         }
 
-        private void OpenDB_Click(object sender, RoutedEventArgs e)
+        private void Open_Click(object sender, RoutedEventArgs e)
         {
             var openFileDialog = new OpenFileDialog
             {
@@ -53,25 +55,34 @@ namespace WDBXEditor2
             DB2DataGrid.Columns.Clear();
             DB2DataGrid.ItemsSource = new List<string>();
 
-            var selectedItem = (string)OpenDBItems.SelectedItem;
-            if (dbLoader.LoadedDBFiles.TryGetValue(selectedItem, out IDBCDStorage storage))
+            currentOpenDB2 = (string)OpenDBItems.SelectedItem;
+            if (currentOpenDB2 == null)
+                return;
+
+            if (dbLoader.LoadedDBFiles.TryGetValue(currentOpenDB2, out IDBCDStorage storage))
             {
                 var stopWatch = new Stopwatch();
                 stopWatch.Start();
 
                 var data = new DataTable();
-                FillColumns(storage, ref data);
+                PopulateColumns(storage, ref data);
                 if (storage.Values.Count > 0)
-                    FillData(storage, ref data);
+                    PopulateDataView(storage, ref data);
 
                 stopWatch.Stop();
-                Console.WriteLine($"Populating Grid: {selectedItem} Elapsed Time: {stopWatch.Elapsed}");
+                Console.WriteLine($"Populating Grid: {currentOpenDB2} Elapsed Time: {stopWatch.Elapsed}");
 
+                openedDB2Storage = storage;
                 DB2DataGrid.ItemsSource = data.DefaultView;
             }
+
+            Title = $"WDBXEditor2  -  {Constants.Version}  -  {currentOpenDB2}";
         }
 
-        private void FillColumns(IDBCDStorage storage, ref DataTable data)
+        /// <summary>
+        /// Populate the DataView with the DB2 Columns.
+        /// </summary>
+        private void PopulateColumns(IDBCDStorage storage, ref DataTable data)
         {
             var firstItem = storage.Values.First();
 
@@ -90,7 +101,10 @@ namespace WDBXEditor2
             }
         }
 
-        private void FillData(IDBCDStorage storage, ref DataTable data)
+        /// <summary>
+        /// Populate the DataView with the DB2 Data.
+        /// </summary>
+        private void PopulateDataView(IDBCDStorage storage, ref DataTable data)
         {
             foreach (var rowData in storage.Values)
             {
@@ -111,6 +125,51 @@ namespace WDBXEditor2
                 }
 
                 data.Rows.Add(row);
+            }
+        }
+
+        /// <summary>
+        /// Close the currently opened DB2 file.
+        /// </summary>
+        private void Close_Click(object sender, RoutedEventArgs e)
+        {
+            Title = $"WDBXEditor2  -  {Constants.Version}";
+
+            // Remove the DB2 file from the open files.
+            OpenDBItems.Items.Remove(currentOpenDB2);
+
+            // Clear DataGrid
+            DB2DataGrid.Columns.Clear();
+        }
+
+        private void Save_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentOpenDB2 != "" || currentOpenDB2 != string.Empty)
+                dbLoader.LoadedDBFiles[currentOpenDB2].Save(currentOpenDB2);
+        }
+
+        private void SaveAs_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void DB2DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+        {
+            if (e.EditAction == DataGridEditAction.Commit)
+            {
+                if (e.Column != null)
+                {
+                    var rowIdx = e.Row.GetIndex();
+                    if (rowIdx > openedDB2Storage.Keys.Count)
+                        throw new Exception();
+
+                    var newVal = e.EditingElement as TextBox;
+
+                    var dbcRow = openedDB2Storage.Values.ElementAt(rowIdx);
+                    // dbcRow[e.Column.Header.ToString()] = newVal.Text;
+
+                    Console.WriteLine($"RowIdx: {rowIdx} Text: {newVal.Text}");
+                }
             }
         }
     }
