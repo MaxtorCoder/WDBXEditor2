@@ -7,10 +7,9 @@ namespace DBFileReaderLib.Common
     class BitReader
     {
         private readonly byte[] m_array;
-        private int m_readPos;
         private int m_readOffset;
 
-        public int Position { get => m_readPos; set => m_readPos = value; }
+        public int Position { get; set; }
         public int Offset { get => m_readOffset; set => m_readOffset = value; }
 
         public BitReader(byte[] data) => m_array = data;
@@ -23,15 +22,15 @@ namespace DBFileReaderLib.Common
 
         public uint ReadUInt32(int numBits)
         {
-            uint result = Unsafe.As<byte, uint>(ref m_array[m_readOffset + (m_readPos >> 3)]) << (32 - numBits - (m_readPos & 7)) >> (32 - numBits);
-            m_readPos += numBits;
+            uint result = Unsafe.As<byte, uint>(ref m_array[m_readOffset + (Position >> 3)]) << (32 - numBits - (Position & 7)) >> (32 - numBits);
+            Position += numBits;
             return result;
         }
 
         public ulong ReadUInt64(int numBits)
         {
-            ulong result = Unsafe.As<byte, ulong>(ref m_array[m_readOffset + (m_readPos >> 3)]) << (64 - numBits - (m_readPos & 7)) >> (64 - numBits);
-            m_readPos += numBits;
+            ulong result = Unsafe.As<byte, ulong>(ref m_array[m_readOffset + (Position >> 3)]) << (64 - numBits - (Position & 7)) >> (64 - numBits);
+            Position += numBits;
             return result;
         }
 

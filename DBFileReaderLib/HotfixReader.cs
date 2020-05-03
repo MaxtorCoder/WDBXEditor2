@@ -36,7 +36,6 @@ namespace DBFileReaderLib
             }
         }
 
-
         public void ApplyHotfixes<T>(IDictionary<int, T> storage, DBParser dbReader) where T : class, new() => ReadHotfixes(storage, dbReader);
 
         public void CombineCaches(params string[] files)

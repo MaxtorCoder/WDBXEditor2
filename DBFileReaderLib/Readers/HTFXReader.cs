@@ -11,11 +11,10 @@ namespace DBFileReaderLib.Readers
 {
     class HTFXRow : IDBRow, IHotfixEntry, IEquatable<HTFXRow>
     {
-        private BitReader m_data;
         private readonly IHotfixEntry m_hotfixEntry;
 
         public int Id { get; set; }
-        public BitReader Data { get => m_data; set => m_data = value; }
+        public BitReader Data { get; set; }
 
         public int PushId => m_hotfixEntry.PushId;
         public uint TableHash => m_hotfixEntry.TableHash;
@@ -25,7 +24,7 @@ namespace DBFileReaderLib.Readers
 
         public HTFXRow(BitReader data, IHotfixEntry hotfixEntry)
         {
-            m_data = data;
+            Data = data;
             m_hotfixEntry = hotfixEntry;
 
             Id = hotfixEntry.RecordId;
@@ -77,14 +76,14 @@ namespace DBFileReaderLib.Readers
                 if (info.IsArray)
                 {
                     if (arrayReaders.TryGetValue(info.Field.FieldType, out var reader))
-                        value = reader(m_data, info.Cardinality);
+                        value = reader(Data, info.Cardinality);
                     else
                         throw new Exception("Unhandled array type: " + typeof(T).Name);
                 }
                 else
                 {
                     if (simpleReaders.TryGetValue(info.Field.FieldType, out var reader))
-                        value = reader(m_data);
+                        value = reader(Data);
                     else
                         throw new Exception("Unhandled field type: " + typeof(T).Name);
                 }
@@ -125,7 +124,7 @@ namespace DBFileReaderLib.Readers
                 hash = (hash * 486187739) + RecordId;
                 hash = (hash * 486187739) + (IsValid ? 1 : 0);
                 hash = (hash * 486187739) + DataSize;
-                hash = (hash * 486187739) + m_data.GetHashCode();
+                hash = (hash * 486187739) + Data.GetHashCode();
                 return hash;
             }
         }

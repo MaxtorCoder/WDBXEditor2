@@ -9,27 +9,26 @@ namespace DBFileReaderLib.Readers
 {
     class WDB5Row : IDBRow
     {
-        private BitReader m_data;
         private BaseReader m_reader;
         private readonly int m_dataOffset;
         private readonly int m_dataPosition;
         private readonly int m_recordIndex;
 
         public int Id { get; set; }
-        public BitReader Data { get => m_data; set => m_data = value; }
+        public BitReader Data { get; set; }
 
         private readonly FieldMetaData[] m_fieldMeta;
 
         public WDB5Row(BaseReader reader, BitReader data, int id, int recordIndex)
         {
             m_reader = reader;
-            m_data = data;
+            Data = data;
             m_recordIndex = recordIndex;
 
             Id = id;
 
-            m_dataOffset = m_data.Offset;
-            m_dataPosition = m_data.Position;
+            m_dataOffset = Data.Offset;
+            m_dataPosition = Data.Position;
             m_fieldMeta = reader.Meta;
         }
 
@@ -65,8 +64,8 @@ namespace DBFileReaderLib.Readers
         {
             int indexFieldOffSet = 0;
 
-            m_data.Position = m_dataPosition;
-            m_data.Offset = m_dataOffset;
+            Data.Position = m_dataPosition;
+            Data.Offset = m_dataOffset;
 
             for (int i = 0; i < fields.Length; i++)
             {
@@ -76,7 +75,7 @@ namespace DBFileReaderLib.Readers
                     if (Id != -1)
                         indexFieldOffSet++;
                     else
-                        Id = GetFieldValue<int>(m_data, m_fieldMeta[i]);
+                        Id = GetFieldValue<int>(Data, m_fieldMeta[i]);
 
                     info.Setter(entry, Convert.ChangeType(Id, info.Field.FieldType));
                     continue;
@@ -98,14 +97,14 @@ namespace DBFileReaderLib.Readers
                         SetCardinality(info, fieldIndex);
 
                     if (arrayReaders.TryGetValue(info.Field.FieldType, out var reader))
-                        value = reader(m_data, m_fieldMeta[fieldIndex], m_reader.StringTable, info.Cardinality);
+                        value = reader(Data, m_fieldMeta[fieldIndex], m_reader.StringTable, info.Cardinality);
                     else
                         throw new Exception("Unhandled array type: " + typeof(T).Name);
                 }
                 else
                 {
                     if (simpleReaders.TryGetValue(info.Field.FieldType, out var reader))
-                        value = reader(m_data, m_fieldMeta[fieldIndex], m_reader.StringTable, m_reader);
+                        value = reader(Data, m_fieldMeta[fieldIndex], m_reader.StringTable, m_reader);
                     else
                         throw new Exception("Unhandled field type: " + typeof(T).Name);
                 }
