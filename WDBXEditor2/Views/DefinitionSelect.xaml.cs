@@ -12,10 +12,7 @@ namespace WDBXEditor2.Views
 {
     public partial class DefinitionSelect : Window
     {
-        private List<DefinitionSelectData> DefinitionSelectData = new List<DefinitionSelectData>()
-        {
-            new DefinitionSelectData() { DisplayName = "Autoselect", Build = null }
-        };
+        private List<DefinitionSelectData> DefinitionSelectData = new List<DefinitionSelectData>();
 
         private List<LocalSelectData> LocalSelectData = new List<LocalSelectData>()
         {
@@ -57,7 +54,7 @@ namespace WDBXEditor2.Views
 
         private void Load_Click(object sender, RoutedEventArgs e)
         {
-            SelectedVersion = (DefinitionSelectList.SelectedValue as DefinitionSelectData).Build;
+            SelectedVersion = (DefinitionSelectList.SelectedValue as DefinitionSelectData).Version;
             IsCanceled = false;
             Close();
         }
@@ -86,7 +83,7 @@ namespace WDBXEditor2.Views
                         DefinitionSelectData.Add(new DefinitionSelectData()
                         {
                             DisplayName = String.Format("{0} - {1}", buildRange.minBuild, buildRange.maxBuild),
-                            Build = buildRange.maxBuild.ToString()
+                            Version = buildRange.maxBuild.ToString()
                         });
                     }
                 }
@@ -97,13 +94,16 @@ namespace WDBXEditor2.Views
                         DefinitionSelectData.Add(new DefinitionSelectData()
                         {
                             DisplayName = build.ToString(),
-                            Build = build.ToString()
+                            Version = build.ToString()
                         });
                     }
                 }
             }
 
-            DefinitionSelectList.ItemsSource = DefinitionSelectData.OrderBy(e => e.Build).ToList();
+            DefinitionSelectList.ItemsSource = DefinitionSelectData
+                .OrderByDescending(e => e.Version)
+                .Prepend(new DefinitionSelectData() { DisplayName = "Autoselect", Version = null })
+                .ToList();
         }
 
         private void LocaleSelected(object sender, SelectionChangedEventArgs e)
@@ -121,7 +121,7 @@ namespace WDBXEditor2.Views
     class DefinitionSelectData
     {
         public string DisplayName { get; set; }
-        public string Build { get; set; } = null;
+        public string Version { get; set; } = null;
     }
 
     class LocalSelectData

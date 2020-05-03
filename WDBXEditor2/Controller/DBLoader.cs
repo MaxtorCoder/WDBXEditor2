@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Windows;
 using WDBXEditor2.Views;
 using static DBDefsLib.Structs;
 
@@ -31,26 +32,49 @@ namespace WDBXEditor2.Controller
             var dbcd = new DBCD.DBCD(dbcProvider, dbdProvider);
             Stopwatch stopWatch = null;
 
+
             foreach (string db2Path in files)
             {
                 string db2Name = Path.GetFileName(db2Path);
 
-                DefinitionSelect definitionSelect = new DefinitionSelect();
-                definitionSelect.SetDB2Name(db2Name);
-                definitionSelect.SetDefinitionFromVersionDefinitions(GetVersionDefinitionsForDB2(db2Path));
-                definitionSelect.ShowDialog();
+                try
+                {
+                    DefinitionSelect definitionSelect = new DefinitionSelect();
+                    definitionSelect.SetDB2Name(db2Name);
+                    definitionSelect.SetDefinitionFromVersionDefinitions(GetVersionDefinitionsForDB2(db2Path));
+                    definitionSelect.ShowDialog();
 
-                if (definitionSelect.IsCanceled)
-                    continue;
+                    if (definitionSelect.IsCanceled)
+                        continue;
 
-                stopWatch = new Stopwatch();
-                var storage = dbcd.Load(db2Path, definitionSelect.SelectedVersion, definitionSelect.SelectedLocale);
-                if (LoadedDBFiles.TryAdd(db2Name, storage))
-                    loadedFiles.Add(db2Name);
+                    stopWatch = new Stopwatch();
+                    var storage = dbcd.Load(db2Path, definitionSelect.SelectedVersion, definitionSelect.SelectedLocale);
+                    if (LoadedDBFiles.TryAdd(db2Name, storage))
+                        loadedFiles.Add(db2Name);
 
-                stopWatch.Stop();
-                Console.WriteLine($"Loading File: {db2Name} Elapsed Time: {stopWatch.Elapsed}");
+                    stopWatch.Stop();
+                    Console.WriteLine($"Loading File: {db2Name} Elapsed Time: {stopWatch.Elapsed}");
+                }
+                catch (AggregateException)
+                {
+                    MessageBox.Show(
+                        String.Format("Cant find defenitions for {0}.\nCheck your Filename and note upper and lower case", db2Name),
+                        "WDBXEditor2",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning
+                    );
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(
+                        String.Format("Cant load {0}.\n{1}", db2Name, ex.InnerException.Message),
+                        "WDBXEditor2",
+                        MessageBoxButton.OK,
+                        MessageBoxImage.Warning
+                    );
+                }
             }
+
 
             return loadedFiles.ToArray();
         }
