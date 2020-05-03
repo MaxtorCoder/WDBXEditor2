@@ -21,11 +21,9 @@ namespace WDBXEditor2.Controller
 
         public Stream StreamForTableName(string tableName, string build = null)
         {
-            var newTableName = Path.GetFileName(tableName).Replace(".db2", "");
+            string dbdName = Path.GetFileName(tableName).Replace(".db2", ".dbd");
 
-            var dbdName = $"{newTableName}.dbd";
-
-            if (!File.Exists($"{CachePath}/{dbdName}"))
+            if (!File.Exists($"{CachePath}/{dbdName}") || (DateTime.Now - File.GetLastWriteTime($"{CachePath}/{dbdName}")).TotalHours > 24)
             {
                 var bytes = client.GetByteArrayAsync(dbdName).Result;
                 File.WriteAllBytes($"{CachePath}/{dbdName}", bytes);

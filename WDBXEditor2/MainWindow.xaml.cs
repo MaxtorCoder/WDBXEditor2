@@ -9,6 +9,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using WDBXEditor2.Controller;
+using WDBXEditor2.Misc;
+using WDBXEditor2.Views;
 
 namespace WDBXEditor2
 {
@@ -24,6 +26,7 @@ namespace WDBXEditor2
         public MainWindow()
         {
             InitializeComponent();
+            SettingStorage.Initialize();
 
             Exit.Click += (e, o) => Close();
 
@@ -42,10 +45,9 @@ namespace WDBXEditor2
             if (openFileDialog.ShowDialog() == true)
             {
                 var files = openFileDialog.FileNames;
-                dbLoader.LoadFiles(files);
 
-                foreach (var loadedFile in openFileDialog.FileNames)
-                    OpenDBItems.Items.Add(Path.GetFileName(loadedFile));
+                foreach (string loadedDB in dbLoader.LoadFiles(files))
+                    OpenDBItems.Items.Add(loadedDB);
             }
         }
 
