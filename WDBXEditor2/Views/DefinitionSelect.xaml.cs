@@ -14,7 +14,7 @@ namespace WDBXEditor2.Views
     {
         private List<DefinitionSelectData> DefinitionSelectData = new List<DefinitionSelectData>()
         {
-            new DefinitionSelectData() { DisplayName = "Automatic select", Build = null }
+            new DefinitionSelectData() { DisplayName = "Autoselect", Build = null }
         };
 
         private List<LocalSelectData> LocalSelectData = new List<LocalSelectData>()
@@ -67,6 +67,12 @@ namespace WDBXEditor2.Views
             SelectedVersion = null;
             IsCanceled = true;
             Close();
+        }
+
+        public void SetDB2Name(string db2Name)
+        {
+            this.db2Name.Content = db2Name;
+            this.Title = String.Format("Select Definition: {0}", db2Name);
         }
 
         public void SetDefinitionFromVersionDefinitions(VersionDefinitions[] versionDefinitions)
