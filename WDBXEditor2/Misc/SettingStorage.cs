@@ -11,7 +11,7 @@ namespace WDBXEditor2.Misc
         {
             settings = new JsonSettings(Path.Combine(
                 AppDomain.CurrentDomain.BaseDirectory,
-                AppDomain.CurrentDomain.FriendlyName.Replace(".exe", ".json")
+                AppDomain.CurrentDomain.FriendlyName + ".json"
             ));
         }
 

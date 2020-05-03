@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" Title="WDBXEditor2" Height="640" Width="960"
-        MinWidth="960" MinHeight="640">
+        MinWidth="960" MinHeight="640" Icon="/Assets/icon.ico">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

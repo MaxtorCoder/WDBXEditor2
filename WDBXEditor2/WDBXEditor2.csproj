@@ -8,26 +8,21 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Assets\icon.ico" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\DBCD\DBCD.csproj">
       <Private>true</Private>
     </ProjectReference>
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Assets\icon.ico">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Resource>
-  </ItemGroup>
-
-  <ItemGroup>
+    <None Remove="Assets\icon.ico" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\icon.ico" />
   </ItemGroup>
 
 </Project>

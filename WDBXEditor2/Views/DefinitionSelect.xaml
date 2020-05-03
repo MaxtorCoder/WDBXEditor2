@@ -5,19 +5,21 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WDBXEditor2.Views"
         mc:Ignorable="d"
-        Title="Select Definition" Height="400" Width="320" ResizeMode="NoResize" Icon="/Assets/icon.ico">
+        Title="Select Definition" Height="400" Width="376" ResizeMode="NoResize" Icon="/Assets/icon.ico">
     <Grid Margin="10,0,10,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="25px"/>
+            <RowDefinition Height="10px"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="30px"/>
         </Grid.RowDefinitions>
         
         <!-- Header -->
-        <Label Content="Builds will be limited to available options" HorizontalAlignment="Left" Margin="-5,-3,0,0" VerticalAlignment="Top" FontWeight="Normal"/>
+        <Label Content="Builds will be limited to available options: " HorizontalAlignment="Left" Margin="-5,-3,0,0" VerticalAlignment="Top" FontWeight="Normal" FontSize="11"/>
+        <Label x:Name="db2Name" Grid.Row="1" HorizontalAlignment="Left" Margin="-5,-12,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="11"/>
 
         <!-- Body -->
-        <ListBox x:Name="DefinitionSelectList" Grid.Row="1" HorizontalAlignment="Stretch" SelectionMode="Single" SelectedIndex="0">
+        <ListBox x:Name="DefinitionSelectList" Grid.Row="2" HorizontalAlignment="Stretch" SelectionMode="Single" SelectedIndex="0">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding DisplayName}"/>
@@ -26,9 +28,9 @@
         </ListBox>
 
         <!-- Footer -->
-        <Button Content="Close" HorizontalAlignment="Right" Margin="0,0,0,0" Grid.Row="2" VerticalAlignment="Bottom" Width="70" Height="20" Click="Close_Click" />
-        <Button Content="Load" HorizontalAlignment="Right" Margin="0,0,80,0" Grid.Row="2" VerticalAlignment="Bottom" Width="70" Height="20" Click="Load_Click"/>
-        <ComboBox x:Name="LocaleSelectList" HorizontalAlignment="Left" Grid.Row="2" VerticalAlignment="Bottom" Width="80" Height="20" IsTextSearchEnabled="False" SelectionChanged="LocaleSelected" SelectedIndex="0">
+        <Button Content="Close" HorizontalAlignment="Right" Margin="0,0,0,0" Grid.Row="3" VerticalAlignment="Bottom" Width="70" Height="20" Click="Close_Click" />
+        <Button Content="Load" HorizontalAlignment="Right" Margin="0,0,80,0" Grid.Row="3" VerticalAlignment="Bottom" Width="70" Height="20" Click="Load_Click"/>
+        <ComboBox x:Name="LocaleSelectList" HorizontalAlignment="Left" Grid.Row="3" VerticalAlignment="Bottom" Width="80" Height="20" IsTextSearchEnabled="False" SelectionChanged="LocaleSelected" SelectedIndex="0">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding DisplayName}"/>
