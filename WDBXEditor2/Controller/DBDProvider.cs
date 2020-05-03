@@ -21,9 +21,7 @@ namespace WDBXEditor2.Controller
 
         public Stream StreamForTableName(string tableName, string build = null)
         {
-            var newTableName = Path.GetFileName(tableName).Replace(".db2", "");
-
-            var dbdName = $"{newTableName}.dbd";
+            string dbdName = Path.GetFileName(tableName).Replace(".db2", ".dbd");
 
             if (!File.Exists($"{CachePath}/{dbdName}"))
             {

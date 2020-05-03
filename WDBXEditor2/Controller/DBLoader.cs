@@ -1,9 +1,11 @@
 ﻿using DBCD;
+using DBDefsLib;
 using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
-using System.Threading.Tasks;
+using WDBXEditor2.Views;
+using static DBDefsLib.Structs;
 
 namespace WDBXEditor2.Controller
 {
@@ -24,17 +26,33 @@ namespace WDBXEditor2.Controller
 
         public void LoadFiles(string[] files)
         {
-            var stopWatch = new Stopwatch();
-            Parallel.ForEach(files, (file) => 
-            {
-                stopWatch.Start();
-                var dbcd = new DBCD.DBCD(dbcProvider, dbdProvider);
-                var storage = dbcd.Load(file, "8.3.0.33941", Locale.EnUS);
+            var dbcd = new DBCD.DBCD(dbcProvider, dbdProvider);
+            Stopwatch stopWatch = null;
 
-                LoadedDBFiles.TryAdd(Path.GetFileName(file), storage);
+            foreach (string db2File in files)
+            {
+                DefinitionSelect definitionSelect = new DefinitionSelect();
+                definitionSelect.SetDefinitionFromVersionDefinitions(GetVersionDefinitionsForDB2(db2File));
+                definitionSelect.ShowDialog();
+
+                if (definitionSelect.IsCanceled)
+                    continue;
+
+                stopWatch = new Stopwatch();
+                var storage = dbcd.Load(db2File, definitionSelect.SelectedVersion, definitionSelect.SelectedLocale);
+                LoadedDBFiles.TryAdd(Path.GetFileName(db2File), storage);
                 stopWatch.Stop();
-                Console.WriteLine($"Loading File: {Path.GetFileName(file)} Elapsed Time: {stopWatch.Elapsed}");
-            });
+                Console.WriteLine($"Loading File: {Path.GetFileName(db2File)} Elapsed Time: {stopWatch.Elapsed}");
+            }
+        }
+
+        public VersionDefinitions[] GetVersionDefinitionsForDB2(string db2File)
+        {
+            var dbdStream = dbdProvider.StreamForTableName(db2File, null);
+            var dbdReader = new DBDReader();
+            var databaseDefinition = dbdReader.Read(dbdStream);
+
+            return databaseDefinition.versionDefinitions;
         }
     }
 }
