@@ -58,7 +58,7 @@ namespace WDBXEditor2.Controller
                 catch (AggregateException)
                 {
                     MessageBox.Show(
-                        String.Format("Cant find defenitions for {0}.\nCheck your Filename and note upper and lower case", db2Name),
+                        string.Format("Cant find defenitions for {0}.\nCheck your Filename and note upper and lower case", db2Name),
                         "WDBXEditor2",
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning
@@ -67,7 +67,7 @@ namespace WDBXEditor2.Controller
                 catch (Exception ex)
                 {
                     MessageBox.Show(
-                        String.Format("Cant load {0}.\n{1}", db2Name, ex.InnerException.Message),
+                        string.Format("Cant load {0}.\n{1}", db2Name, ex.InnerException.Message),
                         "WDBXEditor2",
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning

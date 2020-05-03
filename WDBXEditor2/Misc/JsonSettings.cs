@@ -38,7 +38,7 @@ namespace WDBXEditor2.Misc
         {
             get
             {
-                return (String)_settings[key];
+                return (string)_settings[key];
             }
             set
             {

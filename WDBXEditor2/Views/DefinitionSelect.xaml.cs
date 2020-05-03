@@ -12,25 +12,24 @@ namespace WDBXEditor2.Views
 {
     public partial class DefinitionSelect : Window
     {
-        private List<DefinitionSelectData> DefinitionSelectData = new List<DefinitionSelectData>();
-
-        private List<LocalSelectData> LocalSelectData = new List<LocalSelectData>()
+        private List<DefinitionSelectData> definitionSelectData = new List<DefinitionSelectData>();
+        private List<LocaleSelectInfo> localeSelectData = new List<LocaleSelectInfo>()
         {
-            new LocalSelectData() { DisplayName = "enUS", Locale = Locale.EnUS },
-            new LocalSelectData() { DisplayName = "enGB", Locale = Locale.EnGB },
-            new LocalSelectData() { DisplayName = "koKR", Locale = Locale.KoKR },
-            new LocalSelectData() { DisplayName = "frFR", Locale = Locale.FrFR },
-            new LocalSelectData() { DisplayName = "deDE", Locale = Locale.DeDE },
-            new LocalSelectData() { DisplayName = "enCN", Locale = Locale.EnCN },
-            new LocalSelectData() { DisplayName = "zhCN", Locale = Locale.ZhCN },
-            new LocalSelectData() { DisplayName = "enTW", Locale = Locale.EnTW },
-            new LocalSelectData() { DisplayName = "zhTW", Locale = Locale.ZhTW },
-            new LocalSelectData() { DisplayName = "esES", Locale = Locale.EsES },
-            new LocalSelectData() { DisplayName = "esMX", Locale = Locale.EsMX },
-            new LocalSelectData() { DisplayName = "ruRU", Locale = Locale.RuRU },
-            new LocalSelectData() { DisplayName = "ptPT", Locale = Locale.PtPT },
-            new LocalSelectData() { DisplayName = "ptBR", Locale = Locale.PtBR },
-            new LocalSelectData() { DisplayName = "itIT", Locale = Locale.ItIT }
+            new LocaleSelectInfo() { DisplayName = "enUS", Locale = Locale.EnUS },
+            new LocaleSelectInfo() { DisplayName = "enGB", Locale = Locale.EnGB },
+            new LocaleSelectInfo() { DisplayName = "koKR", Locale = Locale.KoKR },
+            new LocaleSelectInfo() { DisplayName = "frFR", Locale = Locale.FrFR },
+            new LocaleSelectInfo() { DisplayName = "deDE", Locale = Locale.DeDE },
+            new LocaleSelectInfo() { DisplayName = "enCN", Locale = Locale.EnCN },
+            new LocaleSelectInfo() { DisplayName = "zhCN", Locale = Locale.ZhCN },
+            new LocaleSelectInfo() { DisplayName = "enTW", Locale = Locale.EnTW },
+            new LocaleSelectInfo() { DisplayName = "zhTW", Locale = Locale.ZhTW },
+            new LocaleSelectInfo() { DisplayName = "esES", Locale = Locale.EsES },
+            new LocaleSelectInfo() { DisplayName = "esMX", Locale = Locale.EsMX },
+            new LocaleSelectInfo() { DisplayName = "ruRU", Locale = Locale.RuRU },
+            new LocaleSelectInfo() { DisplayName = "ptPT", Locale = Locale.PtPT },
+            new LocaleSelectInfo() { DisplayName = "ptBR", Locale = Locale.PtBR },
+            new LocaleSelectInfo() { DisplayName = "itIT", Locale = Locale.ItIT }
         };
 
         public bool IsCanceled = false;
@@ -41,13 +40,13 @@ namespace WDBXEditor2.Views
         {
             InitializeComponent();
             DefinitionSelectList.Focus();
-            DefinitionSelectList.ItemsSource = DefinitionSelectData;
-            LocaleSelectList.ItemsSource = LocalSelectData;
+            DefinitionSelectList.ItemsSource = definitionSelectData;
+            LocaleSelectList.ItemsSource = localeSelectData;
 
             string lastLocaleSelectedIndexSetting = SettingStorage.Get("LastLocaleSelectedIndex");
             if (lastLocaleSelectedIndexSetting != null)
             {
-                int lastLocaleSelectedIndex = Int32.Parse(lastLocaleSelectedIndexSetting);
+                int lastLocaleSelectedIndex = int.Parse(lastLocaleSelectedIndexSetting);
                 LocaleSelectList.SelectedIndex = lastLocaleSelectedIndex;
             }
         }
@@ -69,7 +68,7 @@ namespace WDBXEditor2.Views
         public void SetDB2Name(string db2Name)
         {
             this.db2Name.Content = db2Name;
-            this.Title = String.Format("Select Definition: {0}", db2Name);
+            Title = string.Format("Select Definition: {0}", db2Name);
         }
 
         public void SetDefinitionFromVersionDefinitions(VersionDefinitions[] versionDefinitions)
@@ -80,9 +79,9 @@ namespace WDBXEditor2.Views
                 {
                     foreach (BuildRange buildRange in versionDefinition.buildRanges)
                     {
-                        DefinitionSelectData.Add(new DefinitionSelectData()
+                        definitionSelectData.Add(new DefinitionSelectData()
                         {
-                            DisplayName = String.Format("{0} - {1}", buildRange.minBuild, buildRange.maxBuild),
+                            DisplayName = string.Format("{0} - {1}", buildRange.minBuild, buildRange.maxBuild),
                             Version = buildRange.maxBuild.ToString()
                         });
                     }
@@ -91,7 +90,7 @@ namespace WDBXEditor2.Views
                 {
                     foreach (Build build in versionDefinition.builds)
                     {
-                        DefinitionSelectData.Add(new DefinitionSelectData()
+                        definitionSelectData.Add(new DefinitionSelectData()
                         {
                             DisplayName = build.ToString(),
                             Version = build.ToString()
@@ -100,7 +99,7 @@ namespace WDBXEditor2.Views
                 }
             }
 
-            DefinitionSelectList.ItemsSource = DefinitionSelectData
+            DefinitionSelectList.ItemsSource = definitionSelectData
                 .OrderByDescending(e => e.Version)
                 .Prepend(new DefinitionSelectData() { DisplayName = "Autoselect", Version = null })
                 .ToList();
@@ -108,7 +107,7 @@ namespace WDBXEditor2.Views
 
         private void LocaleSelected(object sender, SelectionChangedEventArgs e)
         {
-            LocalSelectData localSelectData = (LocaleSelectList.SelectedItem as LocalSelectData);
+            LocaleSelectInfo localSelectData = (LocaleSelectList.SelectedItem as LocaleSelectInfo);
 
             if (localSelectData.Locale != SelectedLocale)
             {
@@ -124,7 +123,7 @@ namespace WDBXEditor2.Views
         public string Version { get; set; } = null;
     }
 
-    class LocalSelectData
+    class LocaleSelectInfo
     {
         public string DisplayName { get; set; }
         public Locale Locale { get; set; }
