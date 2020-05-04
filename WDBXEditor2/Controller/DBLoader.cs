@@ -28,7 +28,7 @@ namespace WDBXEditor2.Controller
 
         public string[] LoadFiles(string[] files)
         {
-            List<string> loadedFiles = new List<string>();
+            var loadedFiles = new List<string>();
             var dbcd = new DBCD.DBCD(dbcProvider, dbdProvider);
             Stopwatch stopWatch = null;
 
@@ -49,7 +49,10 @@ namespace WDBXEditor2.Controller
 
                     stopWatch = new Stopwatch();
                     var storage = dbcd.Load(db2Path, definitionSelect.SelectedVersion, definitionSelect.SelectedLocale);
-                    if (LoadedDBFiles.TryAdd(db2Name, storage))
+
+                    if (LoadedDBFiles.ContainsKey(db2Name))
+                        loadedFiles.Add(db2Name);
+                    else if (LoadedDBFiles.TryAdd(db2Name, storage))
                         loadedFiles.Add(db2Name);
 
                     stopWatch.Stop();
@@ -66,15 +69,15 @@ namespace WDBXEditor2.Controller
                 }
                 catch (Exception ex)
                 {
+                    Console.WriteLine(ex);
                     MessageBox.Show(
-                        string.Format("Cant load {0}.\n{1}", db2Name, ex.InnerException.Message),
+                        string.Format("Cant load {0}.\n{1}", db2Name, ex.Message),
                         "WDBXEditor2",
                         MessageBoxButton.OK,
                         MessageBoxImage.Warning
                     );
                 }
             }
-
 
             return loadedFiles.ToArray();
         }

@@ -142,6 +142,9 @@ namespace WDBXEditor2
 
             // Clear DataGrid
             DB2DataGrid.Columns.Clear();
+
+            currentOpenDB2 = string.Empty;
+            openedDB2Storage = null;
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
@@ -168,7 +171,7 @@ namespace WDBXEditor2
                     var newVal = e.EditingElement as TextBox;
 
                     var dbcRow = openedDB2Storage.Values.ElementAt(rowIdx);
-                    // dbcRow[e.Column.Header.ToString()] = newVal.Text;
+                    dbcRow[currentOpenDB2, e.Column.Header.ToString()] = newVal.Text;
 
                     Console.WriteLine($"RowIdx: {rowIdx} Text: {newVal.Text}");
                 }

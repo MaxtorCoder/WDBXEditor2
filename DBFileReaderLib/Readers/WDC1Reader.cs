@@ -220,29 +220,29 @@ namespace DBFileReaderLib.Readers
                 if (magic != WDC1FmtSig)
                     throw new InvalidDataException("WDC1 file is corrupted!");
 
-                RecordsCount = reader.ReadInt32();
-                FieldsCount = reader.ReadInt32();
-                RecordSize = reader.ReadInt32();
-                StringTableSize = reader.ReadInt32();
+                RecordsCount            = reader.ReadInt32();
+                FieldsCount             = reader.ReadInt32();
+                RecordSize              = reader.ReadInt32();
+                StringTableSize         = reader.ReadInt32();
 
-                TableHash = reader.ReadUInt32();
-                LayoutHash = reader.ReadUInt32();
-                MinIndex = reader.ReadInt32();
-                MaxIndex = reader.ReadInt32();
-                int locale = reader.ReadInt32();
-                int copyTableSize = reader.ReadInt32();
-                Flags = (DB2Flags)reader.ReadUInt16();
-                IdFieldIndex = reader.ReadUInt16();
+                TableHash               = reader.ReadUInt32();
+                LayoutHash              = reader.ReadUInt32();
+                MinIndex                = reader.ReadInt32();
+                MaxIndex                = reader.ReadInt32();
+                int locale              = reader.ReadInt32();
+                int copyTableSize       = reader.ReadInt32();
+                Flags                   = (DB2Flags)reader.ReadUInt16();
+                IdFieldIndex            = reader.ReadUInt16();
 
-                int totalFieldsCount = reader.ReadInt32();
-                int packedDataOffset = reader.ReadInt32(); // Offset within the field where packed data starts
-                int lookupColumnCount = reader.ReadInt32(); // count of lookup columns
-                int sparseTableOffset = reader.ReadInt32(); // absolute value, {uint offset, ushort size}[MaxId - MinId + 1]
-                int indexDataSize = reader.ReadInt32(); // int indexData[IndexDataSize / 4]
-                int columnMetaDataSize = reader.ReadInt32(); // 24 * NumFields bytes, describes column bit packing, {ushort recordOffset, ushort size, uint additionalDataSize, uint compressionType, uint packedDataOffset or commonvalue, uint cellSize, uint cardinality}[NumFields], sizeof(DBC2CommonValue) == 8
-                int commonDataSize = reader.ReadInt32();
-                int palletDataSize = reader.ReadInt32(); // in bytes, sizeof(DBC2PalletValue) == 4
-                int referenceDataSize = reader.ReadInt32(); // uint NumRecords, uint minId, uint maxId, {uint id, uint index}[NumRecords], questionable usefulness...
+                int totalFieldsCount    = reader.ReadInt32();
+                PackedDataOffset        = reader.ReadInt32();   // Offset within the field where packed data starts
+                int lookupColumnCount   = reader.ReadInt32();   // count of lookup columns
+                int sparseTableOffset   = reader.ReadInt32();   // absolute value, {uint offset, ushort size}[MaxId - MinId + 1]
+                int indexDataSize       = reader.ReadInt32();   // int indexData[IndexDataSize / 4]
+                int columnMetaDataSize  = reader.ReadInt32();   // 24 * NumFields bytes, describes column bit packing, {ushort recordOffset, ushort size, uint additionalDataSize, uint compressionType, uint packedDataOffset or commonvalue, uint cellSize, uint cardinality}[NumFields], sizeof(DBC2CommonValue) == 8
+                int commonDataSize      = reader.ReadInt32();
+                int palletDataSize      = reader.ReadInt32();   // in bytes, sizeof(DBC2PalletValue) == 4
+                int referenceDataSize   = reader.ReadInt32();   // uint NumRecords, uint minId, uint maxId, {uint id, uint index}[NumRecords], questionable usefulness...
 
                 if (RecordsCount == 0)
                     return;

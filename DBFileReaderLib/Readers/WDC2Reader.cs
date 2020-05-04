@@ -266,25 +266,25 @@ namespace DBFileReaderLib.Readers
                 if (magic != WDC2FmtSig && magic != CLS1FmtSig)
                     throw new InvalidDataException("WDC2 file is corrupted!");
 
-                Signature = magic;
-                RecordsCount = reader.ReadInt32();
-                FieldsCount = reader.ReadInt32();
-                RecordSize = reader.ReadInt32();
-                StringTableSize = reader.ReadInt32();
-                TableHash = reader.ReadUInt32();
-                LayoutHash = reader.ReadUInt32();
-                MinIndex = reader.ReadInt32();
-                MaxIndex = reader.ReadInt32();
-                int locale = reader.ReadInt32();
-                Flags = (DB2Flags)reader.ReadUInt16();
-                IdFieldIndex = reader.ReadUInt16();
-                int totalFieldsCount = reader.ReadInt32();
-                int packedDataOffset = reader.ReadInt32(); // Offset within the field where packed data starts
-                int lookupColumnCount = reader.ReadInt32(); // count of lookup columns
-                int columnMetaDataSize = reader.ReadInt32(); // 24 * NumFields bytes, describes column bit packing, {ushort recordOffset, ushort size, uint additionalDataSize, uint compressionType, uint packedDataOffset or commonvalue, uint cellSize, uint cardinality}[NumFields], sizeof(DBC2CommonValue) == 8
-                int commonDataSize = reader.ReadInt32();
-                int palletDataSize = reader.ReadInt32(); // in bytes, sizeof(DBC2PalletValue) == 4
-                int sectionsCount = reader.ReadInt32();
+                Signature               = magic;
+                RecordsCount            = reader.ReadInt32();
+                FieldsCount             = reader.ReadInt32();
+                RecordSize              = reader.ReadInt32();
+                StringTableSize         = reader.ReadInt32();
+                TableHash               = reader.ReadUInt32();
+                LayoutHash              = reader.ReadUInt32();
+                MinIndex                = reader.ReadInt32();
+                MaxIndex                = reader.ReadInt32();
+                int locale              = reader.ReadInt32();
+                Flags                   = (DB2Flags)reader.ReadUInt16();
+                IdFieldIndex            = reader.ReadUInt16();
+                int totalFieldsCount    = reader.ReadInt32();
+                PackedDataOffset        = reader.ReadInt32(); // Offset within the field where packed data starts
+                int lookupColumnCount   = reader.ReadInt32(); // count of lookup columns
+                int columnMetaDataSize  = reader.ReadInt32(); // 24 * NumFields bytes, describes column bit packing, {ushort recordOffset, ushort size, uint additionalDataSize, uint compressionType, uint packedDataOffset or commonvalue, uint cellSize, uint cardinality}[NumFields], sizeof(DBC2CommonValue) == 8
+                int commonDataSize      = reader.ReadInt32();
+                int palletDataSize      = reader.ReadInt32(); // in bytes, sizeof(DBC2PalletValue) == 4
+                int sectionsCount       = reader.ReadInt32();
 
                 if (sectionsCount > 1)
                     throw new Exception("WDC2 only supports 1 section");

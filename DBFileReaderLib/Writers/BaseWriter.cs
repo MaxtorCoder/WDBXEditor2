@@ -9,7 +9,7 @@ namespace DBFileReaderLib.Writers
     {
         public FieldCache<T>[] FieldCache { get; protected set; }
         public int RecordsCount { get; protected set; }
-        public int StringTableSize { get; protected set; }
+        public int StringTableSize { get; set; }
         public int FieldsCount { get; }
         public int RecordSize { get; }
         public int IdFieldIndex { get; }

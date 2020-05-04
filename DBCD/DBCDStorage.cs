@@ -1,6 +1,7 @@
 using DBCD.Helpers;
 
 using DBFileReaderLib;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Dynamic;
@@ -13,7 +14,7 @@ namespace DBCD
     {
         public int ID;
 
-        private readonly dynamic raw;
+        private dynamic raw;
         private readonly FieldAccessor fieldAccessor;
 
         internal DBCDRow(int ID, dynamic raw, FieldAccessor fieldAccessor)
@@ -31,6 +32,17 @@ namespace DBCD
         public object this[string fieldName]
         {
             get => fieldAccessor[raw, fieldName];
+        }
+
+        public object this[string filename, string fieldname]
+        {
+            set
+            {
+                var newRaw = (object)raw;
+                var type = newRaw.GetType().GetField(fieldname);
+                type.SetValue(newRaw, Convert.ChangeType(value, type.FieldType));
+                raw = (dynamic)newRaw;
+            }
         }
 
         public T Field<T>(string fieldName)
@@ -93,8 +105,6 @@ namespace DBCD
 
             foreach (var record in db2Storage)
                 Add(record.Key, new DBCDRow(record.Key, record.Value, fieldAccessor));
-
-            parser.ClearCache();
         }
 
         IEnumerator<DynamicKeyValuePair<int>> IEnumerable<DynamicKeyValuePair<int>>.GetEnumerator()

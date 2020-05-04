@@ -310,13 +310,13 @@ namespace DBFileReaderLib.Writers
                 writer.Write((ushort)Flags);
                 writer.Write((ushort)IdFieldIndex);
 
-                writer.Write(FieldsCount); // totalFieldCount
+                writer.Write(FieldsCount);                      // totalFieldCount
                 writer.Write(reader.PackedDataOffset);
-                writer.Write(ReferenceData.Count > 0 ? 1 : 0); // RelationshipColumnCount
-                writer.Write(ColumnMeta.Length * 24); // ColumnMetaDataSize
+                writer.Write(ReferenceData.Count > 0 ? 1 : 0);  // RelationshipColumnCount
+                writer.Write(ColumnMeta.Length * 24);           // ColumnMetaDataSize
                 writer.Write(commonDataSize);
                 writer.Write(palletDataSize);
-                writer.Write(1); // sections count
+                writer.Write(1);                                // sections count
 
                 if (storage.Count == 0)
                     return;
@@ -324,15 +324,15 @@ namespace DBFileReaderLib.Writers
                 // section header
                 int fileOffset = HeaderSize + (Meta.Length * 4) + (ColumnMeta.Length * 24) + Unsafe.SizeOf<SectionHeaderWDC3>() + palletDataSize + commonDataSize;
 
-                writer.Write(0UL); // TactKeyLookup
-                writer.Write(fileOffset); // FileOffset
-                writer.Write(RecordsCount); // NumRecords
+                writer.Write(0UL);                              // TactKeyLookup
+                writer.Write(fileOffset);                       // FileOffset
+                writer.Write(RecordsCount);                     // NumRecords
                 writer.Write(StringTableSize);
-                writer.Write(0); // OffsetRecordsEndOffset
-                writer.Write(RecordsCount * 4); // IndexDataSize
-                writer.Write(referenceDataSize); // ParentLookupDataSize
+                writer.Write(0);                                // OffsetRecordsEndOffset
+                writer.Write(RecordsCount * 4);                 // IndexDataSize
+                writer.Write(referenceDataSize);                // ParentLookupDataSize
                 writer.Write(Flags.HasFlagExt(DB2Flags.Sparse) ? RecordsCount : 0); // OffsetMapIDCount
-                writer.Write(CopyData.Count); // CopyTableCount
+                writer.Write(CopyData.Count);                   // CopyTableCount
 
                 // field meta
                 writer.WriteArray(Meta);
