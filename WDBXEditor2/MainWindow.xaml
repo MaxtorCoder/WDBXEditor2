@@ -5,6 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" Title="WDBXEditor2" Height="640" Width="960"
         MinWidth="960" MinHeight="640" Icon="/Assets/icon.ico">
+    <Window.CommandBindings>
+        <CommandBinding Command="Open" Executed="Open_Click"/>
+        <CommandBinding Command="Save" Executed="Save_Click"/>
+        <CommandBinding Command="SaveAs" Executed="SaveAs_Click"/>
+        <CommandBinding Command="Close" Executed="Close_Click"/>
+    </Window.CommandBindings>
+    <Window.InputBindings>
+        <KeyBinding Key="O" Modifiers="Ctrl" Command="Open"/>
+        <KeyBinding Key="S" Modifiers="Ctrl" Command="Save"/>
+        <KeyBinding Key="S" Modifiers="Ctrl+Shift" Command="SaveAs"/>
+        <KeyBinding Key="W" Modifiers="Ctrl" Command="Close"/>
+    </Window.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -13,13 +25,13 @@
         </Grid.RowDefinitions>
         <Menu IsMainMenu="True" Grid.Row="0" Grid.ColumnSpan="2">
             <MenuItem Header="_File">
-                <MenuItem x:Name="Open" Header="Open..." Click="Open_Click" />
+                <MenuItem x:Name="Open" Header="Open..." Click="Open_Click" InputGestureText="Ctrl+O"/>
                 <Separator />
-                <MenuItem x:Name="Save" Header="Save" Click="Save_Click" />
-                <MenuItem x:Name="SaveAs" Header="Save As..." Click="SaveAs_Click" />
+                <MenuItem x:Name="Save" Header="Save" Click="Save_Click" InputGestureText="Ctrl+S"/>
+                <MenuItem x:Name="SaveAs" Header="Save As..." Click="SaveAs_Click" InputGestureText="Ctrl+Shift+S"/>
                 <Separator />
-                <MenuItem x:Name="CloseDB" Header="Close DB2" Click="Close_Click" />
-                <MenuItem x:Name="Exit" Header="Exit" />
+                <MenuItem x:Name="CloseDB" Header="Close DB2" Click="Close_Click" InputGestureText="Ctrl+W"/>
+                <MenuItem x:Name="Exit" Header="Exit" Click="Exit_Click"/>
             </MenuItem>
             <MenuItem Header="_Edit"/>
             <MenuItem Header="_Export"/>

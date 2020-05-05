@@ -4,13 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using WDBXEditor2.Controller;
 using WDBXEditor2.Misc;
-using WDBXEditor2.Views;
 
 namespace WDBXEditor2
 {
@@ -39,7 +37,7 @@ namespace WDBXEditor2
             {
                 Multiselect = true,
                 Filter = "DB2 Files (*.db2)|*.db2",
-                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer)
             };
 
             if (openFileDialog.ShowDialog() == true)
@@ -149,13 +147,31 @@ namespace WDBXEditor2
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
-            if (currentOpenDB2 != "" || currentOpenDB2 != string.Empty)
+            if (!string.IsNullOrEmpty(currentOpenDB2))
                 dbLoader.LoadedDBFiles[currentOpenDB2].Save(currentOpenDB2);
         }
 
         private void SaveAs_Click(object sender, RoutedEventArgs e)
         {
+            if (string.IsNullOrEmpty(currentOpenDB2))
+                return;
 
+            var saveFileDialog = new SaveFileDialog
+            {
+                FileName = currentOpenDB2,
+                Filter = "DB2 Files (*.db2)|*.db2",
+                InitialDirectory = Environment.GetFolderPath(Environment.SpecialFolder.MyComputer)
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                dbLoader.LoadedDBFiles[currentOpenDB2].Save(saveFileDialog.FileName);
+            }
+        }
+
+        private void Exit_Click(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
         }
 
         private void DB2DataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
