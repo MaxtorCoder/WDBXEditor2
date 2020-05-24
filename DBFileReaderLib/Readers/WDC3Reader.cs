@@ -252,7 +252,7 @@ namespace DBFileReaderLib.Readers
                 LayoutHash              = reader.ReadUInt32();
                 MinIndex                = reader.ReadInt32();
                 MaxIndex                = reader.ReadInt32();
-                int locale              = reader.ReadInt32();
+                Locale                  = reader.ReadInt32();
                 Flags                   = (DB2Flags)reader.ReadUInt16();
                 IdFieldIndex            = reader.ReadUInt16();
                 int totalFieldsCount    = reader.ReadInt32();
